@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import { Blake3Hasher } from '@napi-rs/blake-hash'
+ import { createKeyed } from 'blake3'
 import { MerkleHasher } from '../merkletree'
 import { BufferSerde, NullifierSerdeInstance } from '../serde'
 
@@ -22,16 +22,16 @@ export class NullifierHasher implements MerkleHasher<Nullifier, NullifierHash, s
   }
 
   merkleHash(element: Nullifier): NullifierHash {
-    const hasher = Blake3Hasher.newKeyed(NULLIFIER_KEY)
+    const hasher = createKeyed(NULLIFIER_KEY)
     hasher.update(element)
-    return hasher.digestBuffer()
+    return hasher.digest()
   }
 
   combineHash(depth: number, left: NullifierHash, right: NullifierHash): NullifierHash {
-    const hasher = Blake3Hasher.newKeyed(COMBINE_KEY)
-    hasher.update(Buffer.from([depth]))
+    const hasher = createKeyed(COMBINE_KEY)
+    hasher.update([depth])
     hasher.update(left)
     hasher.update(right)
-    return hasher.digestBuffer()
+    return hasher.digest()
   }
 }
